@@ -1,27 +1,26 @@
 import numpy as np
 from matplotlib import pyplot as plt
 
-def fill_bottom_flat_triangle(face=None, screen=None, res=None, boundary=None):
-
+def fill_bottom_flat_triangle(face=None, screen=None, boundary=None, d=None):
     if type(face) == type(np.array([])):
         face = face.tolist()
 
-    # sort by y and then by x
-    face.sort(key=lambda i: (i[1], -i[0]), reverse=True)
-    resX, resY = res[0], res[1]
-    minX, maxX, minY, maxY = boundary
+    v = [None, None, None]
+    # sort by y
+    face = sorted(face, key=lambda i: i[1], reverse=True)
+    v[0] = face[0]
+    v[1], v[2] = tuple(sorted(face[1:], key=lambda i: i[0], reverse=False))
 
-    dx, dy = (maxX - minX) / resX, (maxY - minY) / resY
+    dx, dy = d
 
-    invslope1 = (face[1][0] - face[0][0]) / (face[1][1] - face[0][1])
-    invslope2 = (face[2][0] - face[0][0]) / (face[2][1] - face[0][1])
+    invslope1 = ((v[1][0] - v[0][0]) / (v[1][1] - v[0][1])) * dy
+    invslope2 = ((v[2][0] - v[0][0]) / (v[2][1] - v[0][1])) * dy
 
-    curx1, curx2 = face[0][0], face[0][0]
+    curx1, curx2 = v[0][0], v[0][0]
 
     # prepocet realnej suradnice na diskretnu suradnicu
-    dy1, dy2 = int((maxY - face[0][1]) // dy), int((maxY - face[1][1]) // dy)
-
-    curdx1, curdx2 = int((curx1 - minX) // dx), int((curx2 - minX) // dx)
+    dy1, dy2 = int((boundary[3] - v[0][1]) // dy), int((boundary[3] - v[1][1]) // dy)
+    curdx1, curdx2 = int((curx1 - boundary[0]) // dx), int((curx2 - boundary[0]) // dx)
 
     for y in range(dy1, dy2 + 1, 1):
         for x in range(curdx1, curdx2 + 1, 1):
@@ -29,29 +28,28 @@ def fill_bottom_flat_triangle(face=None, screen=None, res=None, boundary=None):
 
         curx1 -= invslope1
         curx2 -= invslope2
-        curdx1, curdx2 = int((curx1 - minX) // dx), int((curx2 - minX) // dx)
+        curdx1, curdx2 = int((curx1 - boundary[0]) // dx), int((curx2 - boundary[0]) // dx)
 
-def fill_top_flat_triangle(face=None, screen=None, res=None, boundary=None):
+def fill_top_flat_triangle(face=None, screen=None, boundary=None, d=None):
     if type(face) == type(np.array([])):
         face = face.tolist()
 
-    # sort by y and then by x
-    face.sort(key=lambda i: (i[1], -i[0]), reverse=True)
+    v = [None, None, None]
+    # sort by y
+    face = sorted(face, key=lambda i: i[1], reverse=True)
+    v[2] = face[2]
+    v[0], v[1] = tuple(sorted(face[:-1], key=lambda i: i[0], reverse=False))
+    dx, dy = d
 
-    resX, resY = res[0], res[1]
-    minX, maxX, minY, maxY = boundary
+    invslope1 = ((v[2][0] - v[0][0]) / (v[2][1] - v[0][1])) * dy
+    invslope2 = ((v[2][0] - v[1][0]) / (v[2][1] - v[1][1])) * dy
 
-    dx, dy = (maxX - minX) / resX, (maxY - minY) / resY
-
-    invslope1 = (face[2][0] - face[0][0]) / (face[2][1] - face[0][1])
-    invslope2 = (face[2][0] - face[1][0]) / (face[2][1] - face[1][1])
-
-    curx1, curx2 = face[2][0], face[2][0]
+    curx1, curx2 = v[2][0], v[2][0]
 
     # prepocet realnej suradnice na diskretnu suradnicu
-    dy1, dy2 = int((maxY - face[2][1]) // dy), int((maxY - face[0][1]) // dy)
+    dy1, dy2 = int((boundary[3] - v[2][1]) // dy), int((boundary[3] - v[0][1]) // dy)
 
-    curdx1, curdx2 = int((curx1 - minX) // dx), int((curx2 - minX) // dx)
+    curdx1, curdx2 = int((curx1 - boundary[0]) // dx), int((curx2 - boundary[0]) // dx)
 
     for y in range(dy1, dy2 - 1, -1):
         for x in range(curdx1, curdx2 + 1, 1):
@@ -59,19 +57,19 @@ def fill_top_flat_triangle(face=None, screen=None, res=None, boundary=None):
 
         curx1 += invslope1
         curx2 += invslope2
-        curdx1, curdx2 = int((curx1 - minX) // dx), int((curx2 - minX) // dx)
+        curdx1, curdx2 = int((curx1 - boundary[0]) // dx), int((curx2 - boundary[0]) // dx)
 
 
-def fill_triangle(face=None, screen=None, res=None, boundary=None):
+def fill_triangle(face=None, screen=None, boundary=None, d=None):
     if type(face) == type(np.array([])):
         face = face.tolist()
     # sort by y and then by x
     face.sort(key=lambda i: i[1], reverse=True)
 
     if face[0][1] == face[1][1]:
-        fill_top_flat_triangle(face=face, screen=screen, res=res, boundary=boundary)
+        fill_top_flat_triangle(face=face, screen=screen, boundary=boundary, d=d)
     elif face[1][1] == face[2][1]:
-        fill_bottom_flat_triangle(face=face, screen=screen, res=res, boundary=boundary)
+        fill_bottom_flat_triangle(face=face, screen=screen, boundary=boundary, d=d)
     else:
         # vertex 4 (has to be esetimated)
         #
@@ -87,8 +85,8 @@ def fill_triangle(face=None, screen=None, res=None, boundary=None):
         x = face[0][0] + ((face[1][1] - face[0][1]) / (face[2][1] - face[0][1])) * (face[2][0] - face[0][0])
         face_top_flat, face_bottom_flat = [face[1], face[2], [x, face[1][1]]], [face[0], face[1], [x, face[1][1]]]
 
-        fill_bottom_flat_triangle(face=face_bottom_flat, screen=screen, res=res, boundary=boundary)
-        fill_top_flat_triangle(face=face_top_flat, screen=screen, res=res, boundary=boundary)
+        fill_bottom_flat_triangle(face=face_bottom_flat, screen=screen, boundary=boundary, d=d)
+        fill_top_flat_triangle(face=face_top_flat, screen=screen, boundary=boundary, d=d)
 
 
 t = [[10.3234234, 1.2324],
@@ -110,10 +108,9 @@ minx, maxx = 0, 1600
 miny, maxy = 0, 900
 
 screen = np.zeros(shape=(resy, resx))
+dev = (maxx - minx) / resx, (maxy - miny) / resy
 
-# fill_bottom_flat_triangle(face=t, screen=screen, res=(resx, resy), boundary=(minx, maxx, miny, maxy))
-# fill_top_flat_triangle(face=t, screen=screen, res=(resx, resy), boundary=(minx, maxx, miny, maxy))
-fill_triangle(face=t, screen=screen, res=(resx, resy), boundary=(minx, maxx, miny, maxy))
+fill_triangle(face=t, screen=screen, boundary=(minx, maxx, miny, maxy), d=dev)
 
 
 # plt.scatter(list(zip(*t))[0], list(zip(*t))[1])
