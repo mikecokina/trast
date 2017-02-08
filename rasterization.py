@@ -12,23 +12,35 @@ def fill_bottom_flat_triangle(face=None, screen=None, boundary=None, d=None):
     v[1], v[2] = tuple(sorted(face[1:], key=lambda i: i[0], reverse=False))
 
     dx, dy = d
+     # prepocet realnej suradnice na diskretnu suradnicu
+    dy1, dy2 = int((boundary[3] - v[0][1]) // dy), int((boundary[3] - v[1][1]) // dy)
+    # maximalny rozsah pre riadkove naplnanie
+    max_x, min_x = int((v[2][0] - boundary[0]) // dx) + 1, int((v[1][0] - boundary[0]) // dx) - 1
+
+    if abs(dy2 - dy1) <= 1 and dy / 2.0 > v[0][1] - v[1][1]:
+        return []
 
     invslope1 = ((v[1][0] - v[0][0]) / (v[1][1] - v[0][1])) * dy
     invslope2 = ((v[2][0] - v[0][0]) / (v[2][1] - v[0][1])) * dy
 
     curx1, curx2 = v[0][0], v[0][0]
-
-    # prepocet realnej suradnice na diskretnu suradnicu
-    dy1, dy2 = int((boundary[3] - v[0][1]) // dy), int((boundary[3] - v[1][1]) // dy)
     curdx1, curdx2 = int((curx1 - boundary[0]) // dx), int((curx2 - boundary[0]) // dx)
 
-    for y in range(dy1, dy2 + 1, 1):
+    # except of last line
+    for y in range(dy1, dy2, 1):
         for x in range(curdx1, curdx2 + 1, 1):
             screen[y][x] = 1
 
         curx1 -= invslope1
         curx2 -= invslope2
         curdx1, curdx2 = int((curx1 - boundary[0]) // dx), int((curx2 - boundary[0]) // dx)
+    # last line
+    for x in range(curdx1, curdx2 + 1, 1):
+        if x < min_x:
+            continue
+        elif x > max_x:
+            break
+        screen[dy2][x] = 1
 
 def fill_top_flat_triangle(face=None, screen=None, boundary=None, d=None):
     if type(face) == type(np.array([])):
@@ -40,24 +52,39 @@ def fill_top_flat_triangle(face=None, screen=None, boundary=None, d=None):
     v[2] = face[2]
     v[0], v[1] = tuple(sorted(face[:-1], key=lambda i: i[0], reverse=False))
     dx, dy = d
+    # prepocet realnej suradnice na diskretnu suradnicu
+    dy1, dy2 = int((boundary[3] - v[2][1]) // dy), int((boundary[3] - v[0][1]) // dy)
+    # maximalny rozsah pre riadkove naplnanie
+    max_x, min_x = int((v[1][0] - boundary[0]) // dx) + 1, int((v[0][0] - boundary[0]) // dx) - 1
+
+    # otestovanie, ci sa nema vykonat krko v "y" smere, napriek tomu, ze velkost pixela je daleko vacsia
+    # ako vzdialenost dvoch bodov v "y" smere
+    if abs(dy2 - dy1) <= 1 and dy / 2.0 > v[2][1] - v[0][1]:
+        return []
 
     invslope1 = ((v[2][0] - v[0][0]) / (v[2][1] - v[0][1])) * dy
     invslope2 = ((v[2][0] - v[1][0]) / (v[2][1] - v[1][1])) * dy
 
     curx1, curx2 = v[2][0], v[2][0]
-
-    # prepocet realnej suradnice na diskretnu suradnicu
-    dy1, dy2 = int((boundary[3] - v[2][1]) // dy), int((boundary[3] - v[0][1]) // dy)
-
     curdx1, curdx2 = int((curx1 - boundary[0]) // dx), int((curx2 - boundary[0]) // dx)
 
-    for y in range(dy1, dy2 - 1, -1):
+    # tu sa vykonaju setky riadky okrem posledneho (teda toho flat)
+    # all lines except of last one
+    for y in range(dy1, dy2, -1):
         for x in range(curdx1, curdx2 + 1, 1):
             screen[y][x] = 1
 
         curx1 += invslope1
         curx2 += invslope2
         curdx1, curdx2 = int((curx1 - boundary[0]) // dx), int((curx2 - boundary[0]) // dx)
+    # tu sa vykona ten flat riadok (mam to rozbite z dovodu vykonu, aby sa v kazdom loope nemuselo robit if)
+    # last one
+    for x in range(curdx1, curdx2 + 1, 1):
+        if x < min_x:
+            continue
+        elif x > max_x:
+            break
+        screen[dy2][x] = 1
 
 
 def fill_triangle(face=None, screen=None, boundary=None, d=None):
