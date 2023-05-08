@@ -1,5 +1,5 @@
 [![GPLv3 License](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
-[![Version](https://img.shields.io/badge/version-0.6.dev0-yellow.svg)](https://github.com/mikecokina/trast)
+[![Version](https://img.shields.io/badge/version-0.1.0-yellow.svg)](https://github.com/mikecokina/trast)
 [![Python](https://img.shields.io/badge/python-3.6|3.7|3.8|3.9-orange.svg)](https://www.python.org/)
 [![Python](https://img.shields.io/badge/os-Linux|Windows|MacOS-magenta.svg)](https://en.wikipedia.org/wiki/Operating_system)
 
