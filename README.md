@@ -12,9 +12,9 @@ Usage:
 ```python
 from trast import Rasterizer
 
-t = [[3.0, 3.0],
-     [9.2, 1.3],
-     [4.4, 7.2]]
+t = [[300, 300],
+     [920, 130],
+     [440, 720]]
 
 r = Rasterizer(screen=(1600, 900), pixel=255)
 r.rasterize_triangle(face=t)
@@ -26,3 +26,7 @@ Rasterized screen is accessible as following:
 ```
 screen = r.raster
 ```
+
+Depicted result from above
+
+![image description](assets/rasterized.png)

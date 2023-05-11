@@ -17,6 +17,10 @@ def main():
          [4.436, 7.24324]]
 
     t = (np.array(t) * 100).tolist()
+    t = [[300, 300],
+         [920, 130],
+         [440, 720]]
+
 
     r = Rasterizer(screen=(1600, 900), pixel=255)
     r.rasterize_triangle(face=t)
