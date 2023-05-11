@@ -3,7 +3,7 @@
 [![Python](https://img.shields.io/badge/python-3.6|3.7|3.8|3.9-orange.svg)](https://www.python.org/)
 [![Python](https://img.shields.io/badge/os-Linux|Windows|MacOS-magenta.svg)](https://en.wikipedia.org/wiki/Operating_system)
 
-# TRAST - Triangle - RASTerization
+# TRAST - Triangle RASTerization
 Python implementation of triangle rasterization in computer graphic. Rasterize trinagle/s defined by in 2D plane 
 via 3 simple points on supplied screen size.
 
